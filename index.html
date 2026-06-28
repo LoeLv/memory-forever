@@ -233,6 +233,31 @@
         line-height: 1;
       }
 
+      .btn-decorative-offer {
+        min-height: 44px;
+        padding: 0 20px;
+        pointer-events: none;
+        cursor: default;
+        user-select: none;
+        white-space: nowrap;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 42%),
+          var(--accent);
+        box-shadow:
+          0 16px 34px rgba(139, 228, 207, 0.2),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+      }
+
+      .btn-decorative-offer:hover {
+        transform: none;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 42%),
+          var(--accent);
+        box-shadow:
+          0 16px 34px rgba(139, 228, 207, 0.2),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+      }
+
       .btn-hero {
         min-height: 48px;
         padding: 0 22px;
@@ -1112,6 +1137,15 @@
           justify-content: center;
         }
 
+        .btn-decorative-offer {
+          grid-column: 1 / -1;
+          width: 100%;
+          min-height: 48px;
+          padding: 8px 16px;
+          white-space: normal;
+          line-height: 1.18;
+        }
+
         .main-container {
           padding: 26px 14px 56px;
         }
@@ -1228,6 +1262,9 @@
             <strong id="countNum">0</strong><span>枚记忆</span>
           </div>
           <div class="photo-count"><strong>只读</strong><span>藏馆</span></div>
+          <div class="btn btn-decorative-offer" aria-hidden="true">
+            <span class="btn-symbol">+</span><span>为恩主献上你的记忆！</span>
+          </div>
           <button
             class="btn btn-outline btn-small hidden"
             id="btnOpenInvitePanel"
