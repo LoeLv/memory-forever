@@ -7,8 +7,8 @@
       content="width=device-width, initial-scale=1.0, user-scalable=yes"
     />
     <title>记忆永存 · 共享相册</title>
-    <!-- Supabase CDN (仅引入一次) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase client, hosted with this site so the UI still works if a CDN is blocked. -->
+    <script src="supabase.js"></script>
     <style>
       :root {
         --bg: #faf7f2;
@@ -591,11 +591,19 @@
       const SUPABASE_ANON_KEY =
         "sb_publishable_sZYKAIzDJJYQgzC2Buzhyw_art6KnAS";
 
-      // 初始化 Supabase 客户端 (唯一一次赋值)
-      const supabase = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-      );
+      // 初始化 Supabase 客户端。即使初始化失败，也让页面交互先可用。
+      let supabaseClient = null;
+      try {
+        if (!window.supabase?.createClient) {
+          throw new Error("Supabase client script did not load");
+        }
+        supabaseClient = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_ANON_KEY,
+        );
+      } catch (error) {
+        console.error("Supabase 初始化失败:", error);
+      }
 
       const BUCKET_NAME = "memories";
       const TABLE_NAME = "photos";
@@ -633,7 +641,12 @@
       }
 
       async function loadPhotos() {
-        const { data, error } = await supabase
+        if (!supabaseClient) {
+          toast("照片服务暂时无法连接，请稍后再试", "error");
+          renderPhotos();
+          return;
+        }
+        const { data, error } = await supabaseClient
           .from(TABLE_NAME)
           .select("*")
           .order("created_at", { ascending: false });
@@ -767,6 +780,10 @@
       }
 
       async function startUpload() {
+        if (!supabaseClient) {
+          toast("照片服务暂时无法连接，无法上传", "error");
+          return;
+        }
         if (!pendingFiles.length) {
           toast("请先选择照片", "error");
           return;
@@ -785,16 +802,18 @@
           try {
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${file.name}`;
             const { data: uploadData, error: uploadError } =
-              await supabase.storage.from(BUCKET_NAME).upload(fileName, file, {
-                cacheControl: "3600",
-                upsert: false,
-              });
+              await supabaseClient.storage
+                .from(BUCKET_NAME)
+                .upload(fileName, file, {
+                  cacheControl: "3600",
+                  upsert: false,
+                });
             if (uploadError) throw uploadError;
-            const { data: publicUrlData } = supabase.storage
+            const { data: publicUrlData } = supabaseClient.storage
               .from(BUCKET_NAME)
               .getPublicUrl(fileName);
             const imageUrl = publicUrlData.publicUrl;
-            const { error: insertError } = await supabase
+            const { error: insertError } = await supabaseClient
               .from(TABLE_NAME)
               .insert({
                 title: title || file.name.replace(/\.[^.]+$/, ""),
