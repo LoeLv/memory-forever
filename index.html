@@ -23,7 +23,6 @@
         --accent-hover: #aaf3df;
         --accent-soft: rgba(139, 228, 207, 0.14);
         --pine: #55c1ad;
-        --coral: #ef6848;
         --sky: #162824;
         --gold: #d7ad5a;
         --shadow-sm: 0 1px 2px rgba(20, 31, 29, 0.06);
@@ -537,12 +536,13 @@
 
       .card-title {
         color: var(--ink);
-        font-size: 0.98rem;
+        font-size: 1rem;
         font-weight: 900;
         line-height: 1.35;
-        white-space: nowrap;
+        display: -webkit-box;
         overflow: hidden;
-        text-overflow: ellipsis;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
       }
 
       .card-desc {
@@ -550,9 +550,10 @@
         color: var(--muted);
         font-size: 0.82rem;
         line-height: 1.45;
-        white-space: nowrap;
+        display: -webkit-box;
         overflow: hidden;
-        text-overflow: ellipsis;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
       }
 
       .card-date {
@@ -667,182 +668,6 @@
         background: rgba(255, 255, 255, 0.2);
       }
 
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 900;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 18px;
-        opacity: 0;
-        pointer-events: none;
-        background: rgba(12, 18, 17, 0.58);
-        backdrop-filter: blur(12px);
-        transition: opacity 0.24s ease;
-      }
-
-      .modal-overlay.active {
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      .modal {
-        position: relative;
-        width: min(94vw, 520px);
-        padding: 26px;
-        border: 1px solid rgba(220, 239, 235, 0.18);
-        border-radius: var(--radius-lg);
-        background: rgba(17, 25, 23, 0.96);
-        box-shadow: var(--shadow-md);
-        transform: translateY(14px);
-        transition: transform 0.24s ease;
-      }
-
-      .active .modal {
-        transform: none;
-      }
-
-      .modal-close {
-        top: 16px;
-        right: 16px;
-        width: 38px;
-        height: 38px;
-        border-color: var(--line);
-        background: rgba(255, 255, 255, 0.08);
-        color: var(--ink);
-      }
-
-      .modal-close:hover {
-        background: var(--accent-soft);
-      }
-
-      .modal-title {
-        margin: 4px 48px 18px 0;
-        font-family: var(--font-serif);
-        font-size: 1.55rem;
-        font-weight: 900;
-        line-height: 1.2;
-      }
-
-      .drop-zone {
-        margin-bottom: 16px;
-        padding: 30px 18px;
-        border: 1.5px dashed var(--line-strong);
-        border-radius: 14px;
-        background:
-          linear-gradient(135deg, rgba(139, 228, 207, 0.14), transparent 70%),
-          var(--surface-soft);
-        text-align: center;
-        cursor: pointer;
-        transition:
-          border-color var(--transition),
-          background var(--transition),
-          transform var(--transition);
-      }
-
-      .drop-zone:hover,
-      .drop-zone.drag-over {
-        border-color: var(--accent);
-        background:
-          linear-gradient(135deg, rgba(139, 228, 207, 0.2), transparent 70%),
-          #162420;
-        transform: translateY(-1px);
-      }
-
-      .drop-icon {
-        width: 46px;
-        height: 46px;
-        margin: 0 auto 12px;
-        display: grid;
-        place-items: center;
-        border-radius: 50%;
-        background: var(--accent);
-        color: #081210;
-        font-size: 1.35rem;
-        font-weight: 900;
-      }
-
-      .drop-title {
-        color: var(--ink);
-        font-weight: 900;
-      }
-
-      .drop-help {
-        margin-top: 6px;
-        color: var(--muted);
-        font-size: 0.84rem;
-      }
-
-      .preview-thumbs {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        gap: 8px;
-        margin-bottom: 14px;
-      }
-
-      .preview-thumbs img {
-        width: 100%;
-        aspect-ratio: 1;
-        object-fit: cover;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .form-group {
-        margin-bottom: 12px;
-      }
-
-      .form-group input,
-      .form-group textarea {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        outline: none;
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--ink);
-        font-size: 0.95rem;
-        transition:
-          border-color var(--transition),
-          box-shadow var(--transition),
-          background var(--transition);
-      }
-
-      .form-group textarea {
-        resize: vertical;
-        min-height: 82px;
-      }
-
-      .form-group input:focus,
-      .form-group textarea:focus {
-        border-color: rgba(31, 111, 100, 0.72);
-        background: rgba(255, 255, 255, 0.09);
-        box-shadow: 0 0 0 4px rgba(31, 111, 100, 0.12);
-      }
-
-      .btn-full {
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .upload-progress {
-        height: 8px;
-        margin: 14px 0 4px;
-        display: none;
-        overflow: hidden;
-        border-radius: 999px;
-        background: var(--surface-soft);
-      }
-
-      .upload-progress .bar {
-        width: 0%;
-        height: 100%;
-        border-radius: inherit;
-        background: linear-gradient(90deg, var(--accent), var(--coral));
-        transition: width 0.3s ease;
-      }
-
       .toast {
         position: fixed;
         left: 50%;
@@ -904,22 +729,6 @@
         font-size: 0.8rem;
       }
 
-      .lb-actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 12px;
-      }
-
-      .btn-danger {
-        background: #b74233;
-        box-shadow: 0 18px 38px rgba(183, 66, 51, 0.18);
-      }
-
-      .btn-danger:hover {
-        background: #a43729;
-        box-shadow: 0 22px 48px rgba(183, 66, 51, 0.24);
-      }
-
       @media (max-width: 760px) {
         .header {
           padding: 10px 14px;
@@ -933,15 +742,14 @@
 
         .header-actions {
           width: 100%;
-          justify-content: space-between;
-        }
-
-        .header-actions .btn {
-          flex: 1;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
         }
 
         .photo-count {
-          flex: 0 0 auto;
+          width: 100%;
+          justify-content: center;
         }
 
         .main-container {
@@ -960,8 +768,9 @@
         }
 
         .empty-title {
-          max-width: 7.6em;
-          font-size: clamp(2.55rem, 16vw, 4rem);
+          max-width: 100%;
+          font-size: clamp(2.2rem, 12vw, 3.45rem);
+          line-height: 1.02;
         }
 
         .empty-desc {
@@ -1027,18 +836,6 @@
           display: none;
         }
 
-        .modal {
-          padding: 22px 18px 18px;
-        }
-
-        .modal-title {
-          font-size: 1.35rem;
-        }
-
-        .drop-zone {
-          padding: 24px 14px;
-        }
-
         .lightbox-nav {
           width: 38px;
           height: 38px;
@@ -1060,9 +857,7 @@
           <div class="photo-count">
             <strong id="countNum">0</strong><span>枚记忆</span>
           </div>
-          <button class="btn" id="btnUpload" type="button">
-            <span class="btn-symbol">+</span><span>献上记忆</span>
-          </button>
+          <div class="photo-count"><strong>只读</strong><span>藏馆</span></div>
         </div>
       </div>
     </header>
@@ -1071,17 +866,12 @@
       <div class="empty-state" id="emptyState">
         <section class="empty-copy">
           <div class="empty-eyebrow">The Archive of Memory</div>
-          <h1 class="empty-title">记忆之神正在等待第一枚切片</h1>
+          <h1 class="empty-title">尚无记忆入馆</h1>
           <p class="empty-desc">
-            将照片献入藏馆，让《诸神愚戏》里的瞬间被收录、被观看、被记住。
+            这里是《诸神愚戏》记忆之神的只读藏馆。已收录的片段会安静陈列，供人翻看、辨认与记住。
           </p>
           <div class="empty-actions">
-            <button class="btn btn-hero" id="btnUploadEmpty" type="button">
-              <span class="btn-symbol">+</span><span>献上第一枚记忆</span>
-            </button>
-            <span class="empty-note"
-              >支持 JPG / PNG / WebP，单枚不超过 10MB</span
-            >
+            <span class="empty-note">馆主统一收录，公开上传已关闭。</span>
           </div>
         </section>
         <aside class="memory-stack" aria-hidden="true">
@@ -1093,50 +883,14 @@
       <section class="archive-head hidden" id="archiveHead">
         <div>
           <div class="archive-kicker">Collected Fragments</div>
-          <h1 class="archive-title">已收录的记忆切片</h1>
+          <h1 class="archive-title">已封存的记忆切片</h1>
         </div>
         <p class="archive-desc">
-          每一枚切片都会进入记忆之神的藏馆，成为《诸神愚戏》公开档案的一部分。
+          每一枚切片都被封存在记忆之神的藏馆，成为《诸神愚戏》只读档案的一部分。
         </p>
       </section>
       <div class="photo-grid hidden" id="photoGrid"></div>
     </main>
-
-    <div class="modal-overlay" id="uploadModal">
-      <div class="modal">
-        <button
-          class="lightbox-close modal-close"
-          id="btnModalClose"
-          type="button"
-        >
-          ✕
-        </button>
-        <h3 class="modal-title">向藏馆献上记忆</h3>
-        <div class="drop-zone" id="dropZone">
-          <span class="drop-icon">+</span>
-          <p class="drop-title">选择照片，或将记忆切片拖拽至此</p>
-          <p class="drop-help">支持 JPG/PNG/WebP，单枚不超过 10MB</p>
-          <input type="file" id="fileInput" accept="image/*" multiple hidden />
-        </div>
-        <div class="preview-thumbs" id="previewThumbs"></div>
-        <div class="form-group">
-          <input type="text" id="photoTitle" placeholder="记忆名称（可选）" />
-        </div>
-        <div class="form-group">
-          <textarea
-            id="photoDesc"
-            rows="2"
-            placeholder="写下这枚记忆的来处（可选）"
-          ></textarea>
-        </div>
-        <div class="upload-progress" id="uploadProgress">
-          <div class="bar" id="progressBar"></div>
-        </div>
-        <button class="btn btn-full" id="btnConfirmUpload" type="button">
-          <span class="btn-symbol">↑</span><span>存入藏馆</span>
-        </button>
-      </div>
-    </div>
 
     <div class="lightbox-overlay" id="lightbox">
       <button class="lightbox-close" id="btnLightboxClose" type="button">
@@ -1156,17 +910,12 @@
           <div class="lb-title" id="lbTitle"></div>
           <div class="lb-desc" id="lbDesc"></div>
           <div class="lb-date" id="lbDate"></div>
-          <div class="lb-actions">
-            <button class="btn btn-danger" id="btnDeleteCurrent" type="button">
-              删除这枚记忆
-            </button>
-          </div>
         </div>
       </div>
     </div>
 
     <div class="toast" id="toast"></div>
-    <footer class="footer">记忆藏馆 · 《诸神愚戏》记忆之神的公开档案</footer>
+    <footer class="footer">记忆藏馆 · 《诸神愚戏》记忆之神的只读档案</footer>
 
     <script>
       // ==================== 您的 Supabase 配置 (仅声明一次) ====================
@@ -1188,34 +937,22 @@
         console.error("Supabase 初始化失败:", error);
       }
 
-      const BUCKET_NAME = "memories";
       const TABLE_NAME = "photos";
 
       // ==================== 全局状态 ====================
       let allPhotos = [];
       let currentLightboxIndex = -1;
-      let pendingFiles = [];
 
       // DOM 元素
       const $photoGrid = document.getElementById("photoGrid");
       const $emptyState = document.getElementById("emptyState");
       const $archiveHead = document.getElementById("archiveHead");
       const $countNum = document.getElementById("countNum");
-      const $uploadModal = document.getElementById("uploadModal");
-      const $dropZone = document.getElementById("dropZone");
-      const $fileInput = document.getElementById("fileInput");
-      const $previewThumbs = document.getElementById("previewThumbs");
-      const $photoTitle = document.getElementById("photoTitle");
-      const $photoDesc = document.getElementById("photoDesc");
-      const $uploadProgress = document.getElementById("uploadProgress");
-      const $progressBar = document.getElementById("progressBar");
-      const $btnConfirm = document.getElementById("btnConfirmUpload");
       const $lightbox = document.getElementById("lightbox");
       const $lightboxImg = document.getElementById("lightboxImg");
       const $lbTitle = document.getElementById("lbTitle");
       const $lbDesc = document.getElementById("lbDesc");
       const $lbDate = document.getElementById("lbDate");
-      const $btnDeleteCurrent = document.getElementById("btnDeleteCurrent");
       const $toast = document.getElementById("toast");
 
       function toast(msg, type = "") {
@@ -1269,7 +1006,7 @@
             <div class="card-info">
               <div class="card-title">${escapeHTML(displayTitle(photo))}</div>
               <div class="card-desc">${escapeHTML(photo.description || "未写明来处")}</div>
-              <div class="card-date">收录 ${formatDate(photo.created_at)}</div>
+              <div class="card-date">封存 ${formatDate(photo.created_at)}</div>
             </div>
           `;
             const img = card.querySelector("img");
@@ -1316,7 +1053,7 @@
         $lightboxImg.src = p.image_url;
         $lbTitle.textContent = displayTitle(p);
         $lbDesc.textContent = p.description || "";
-        $lbDate.textContent = "收录于 " + formatDate(p.created_at);
+        $lbDate.textContent = "封存于 " + formatDate(p.created_at);
         $lightbox.classList.add("active");
         document.body.style.overflow = "hidden";
       }
@@ -1334,197 +1071,7 @@
         openLightbox(idx);
       }
 
-      async function deleteCurrentPhoto() {
-        if (!supabaseClient) {
-          toast("记忆藏馆暂时无法连接，无法删除", "error");
-          return;
-        }
-        const photo = allPhotos[currentLightboxIndex];
-        if (!photo) return;
-        if (!confirm(`确定删除「${displayTitle(photo)}」吗？`)) return;
-        const { error } = await supabaseClient
-          .from(TABLE_NAME)
-          .delete()
-          .eq("id", photo.id);
-        if (error) {
-          console.error("删除记忆失败:", error);
-          toast("删除失败，请检查权限或网络", "error");
-          return;
-        }
-        try {
-          const url = new URL(photo.image_url);
-          const path = url.pathname.split(
-            `/storage/v1/object/public/${BUCKET_NAME}/`,
-          )[1];
-          if (path) {
-            await supabaseClient.storage
-              .from(BUCKET_NAME)
-              .remove([decodeURIComponent(path)]);
-          }
-        } catch (e) {
-          console.warn("删除存储文件失败:", e);
-        }
-        closeLightbox();
-        await loadPhotos();
-        toast("记忆已删除", "success");
-      }
-
-      function openUploadModal() {
-        resetForm();
-        $uploadModal.classList.add("active");
-        document.body.style.overflow = "hidden";
-      }
-
-      function closeUploadModal() {
-        $uploadModal.classList.remove("active");
-        document.body.style.overflow = "";
-        resetForm();
-      }
-
-      function resetForm() {
-        $fileInput.value = "";
-        $photoTitle.value = "";
-        $photoDesc.value = "";
-        $previewThumbs.innerHTML = "";
-        $uploadProgress.style.display = "none";
-        $progressBar.style.width = "0%";
-        pendingFiles = [];
-      }
-
-      function handleFiles(files) {
-        const valid = Array.from(files).filter((f) => {
-          if (!f.type.startsWith("image/")) {
-            toast(`"${f.name}" 不是图片`, "error");
-            return false;
-          }
-          if (f.size > 10 * 1024 * 1024) {
-            toast(`"${f.name}" 超过10MB`, "error");
-            return false;
-          }
-          return true;
-        });
-        if (!valid.length) return;
-        pendingFiles = [...pendingFiles, ...valid];
-        valid.forEach((f) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const thumb = document.createElement("img");
-            thumb.src = e.target.result;
-            $previewThumbs.appendChild(thumb);
-          };
-          reader.readAsDataURL(f);
-        });
-        if (pendingFiles.length && !$photoTitle.value) {
-          $photoTitle.value = pendingFiles[0].name
-            .replace(/\.[^.]+$/, "")
-            .slice(0, 40);
-        }
-      }
-
-      async function startUpload() {
-        if (!supabaseClient) {
-          toast("记忆藏馆暂时无法连接，无法存入", "error");
-          return;
-        }
-        if (!pendingFiles.length) {
-          toast("请先选择一枚记忆切片", "error");
-          return;
-        }
-        $btnConfirm.disabled = true;
-        $btnConfirm.textContent = "存入藏馆中...";
-        $uploadProgress.style.display = "block";
-        $progressBar.style.width = "0%";
-        const title = $photoTitle.value.trim();
-        const desc = $photoDesc.value.trim();
-        let success = 0;
-        const total = pendingFiles.length;
-
-        for (let i = 0; i < total; i++) {
-          const file = pendingFiles[i];
-          try {
-            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${file.name}`;
-            const { data: uploadData, error: uploadError } =
-              await supabaseClient.storage
-                .from(BUCKET_NAME)
-                .upload(fileName, file, {
-                  cacheControl: "3600",
-                  upsert: false,
-                });
-            if (uploadError) throw uploadError;
-            const { data: publicUrlData } = supabaseClient.storage
-              .from(BUCKET_NAME)
-              .getPublicUrl(fileName);
-            const imageUrl = publicUrlData.publicUrl;
-            const { error: insertError } = await supabaseClient
-              .from(TABLE_NAME)
-              .insert({
-                title: title || file.name.replace(/\.[^.]+$/, ""),
-                description: desc,
-                image_url: imageUrl,
-                created_at: new Date().toISOString(),
-              });
-            if (insertError) throw insertError;
-            success++;
-          } catch (err) {
-            console.error("存入失败:", file.name, err);
-            toast(`"${file.name}" 存入失败`, "error");
-          }
-          $progressBar.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
-        }
-        await loadPhotos();
-        resetForm();
-        $uploadProgress.style.display = "none";
-        $btnConfirm.disabled = false;
-        $btnConfirm.innerHTML =
-          '<span class="btn-symbol">↑</span><span>存入藏馆</span>';
-        closeUploadModal();
-        if (success) toast(`已收录 ${success} 枚记忆`, "success");
-      }
-
       // 事件绑定
-      document
-        .getElementById("btnUpload")
-        .addEventListener("click", openUploadModal);
-      document
-        .getElementById("btnUploadEmpty")
-        .addEventListener("click", openUploadModal);
-      document
-        .getElementById("btnModalClose")
-        .addEventListener("click", closeUploadModal);
-      $uploadModal.addEventListener("click", (e) => {
-        if (e.target === $uploadModal) closeUploadModal();
-      });
-      $btnConfirm.addEventListener("click", startUpload);
-      $dropZone.addEventListener("click", () => $fileInput.click());
-      $fileInput.addEventListener("change", (e) => {
-        if (e.target.files.length) handleFiles(e.target.files);
-      });
-      $dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        $dropZone.classList.add("drag-over");
-      });
-      $dropZone.addEventListener("dragleave", () =>
-        $dropZone.classList.remove("drag-over"),
-      );
-      $dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        $dropZone.classList.remove("drag-over");
-        if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-      });
-      document.addEventListener("dragover", (e) => e.preventDefault());
-      document.addEventListener("drop", (e) => {
-        e.preventDefault();
-        if ($uploadModal.classList.contains("active")) return;
-        if (
-          e.dataTransfer.files.length &&
-          Array.from(e.dataTransfer.files).some((f) =>
-            f.type.startsWith("image/"),
-          )
-        ) {
-          openUploadModal();
-          handleFiles(e.dataTransfer.files);
-        }
-      });
       document
         .getElementById("btnLightboxClose")
         .addEventListener("click", closeLightbox);
@@ -1537,16 +1084,12 @@
       document
         .getElementById("btnNext")
         .addEventListener("click", () => navLightbox(1));
-      $btnDeleteCurrent.addEventListener("click", deleteCurrentPhoto);
       document.addEventListener("keydown", (e) => {
         if ($lightbox.classList.contains("active")) {
           if (e.key === "Escape") closeLightbox();
           if (e.key === "ArrowLeft") navLightbox(-1);
           if (e.key === "ArrowRight") navLightbox(1);
-          if (e.key === "Delete") deleteCurrentPhoto();
         }
-        if ($uploadModal.classList.contains("active") && e.key === "Escape")
-          closeUploadModal();
       });
 
       // 启动加载
