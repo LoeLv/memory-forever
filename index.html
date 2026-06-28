@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>记忆永存 · 共享相册</title>
+    <!-- Supabase CDN (仅引入一次) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      :root {
+        --bg: #faf7f2;
+        --card-bg: #ffffff;
+        --text: #3d3226;
+        --text-light: #6b5e4f;
+        --text-lighter: #9b8d7c;
+        --accent: #c17f59;
+        --accent-hover: #a86d48;
+        --accent-light: #e8d5c4;
+        --gold: #bfa87a;
+        --border: #e6ddd2;
+        --border-light: #f0eae0;
+        --shadow-sm: 0 1px 3px rgba(61, 50, 38, 0.06);
+        --shadow: 0 4px 16px rgba(61, 50, 38, 0.08);
+        --shadow-md: 0 8px 32px rgba(61, 50, 38, 0.12);
+        --radius: 12px;
+        --radius-lg: 16px;
+        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --font-serif: "Georgia", "Noto Serif SC", "STSong", "Songti SC", serif;
+        --font-sans: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-image:
+          radial-gradient(
+            ellipse at 30% 20%,
+            rgba(193, 127, 89, 0.04) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse at 80% 70%,
+            rgba(191, 168, 122, 0.05) 0%,
+            transparent 60%
+          );
+        background-attachment: fixed;
+      }
+      .header {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border-light);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 0 24px;
+      }
+      .header-inner {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #c17f59, #a86d48);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(168, 109, 72, 0.3);
+      }
+      .brand-name {
+        font-family: var(--font-serif);
+        font-size: 1.3rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+      }
+      .photo-count {
+        background: #f5f0e8;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        font-weight: 500;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: var(--transition);
+        font-family: var(--font-sans);
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(168, 109, 72, 0.3);
+      }
+      .btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--accent);
+        border: 2px solid var(--accent-light);
+        box-shadow: none;
+      }
+      .btn-outline:hover {
+        background: var(--accent-light);
+      }
+      .main-container {
+        flex: 1;
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 28px 20px 60px;
+        width: 100%;
+      }
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 55vh;
+        text-align: center;
+        animation: fadeIn 0.6s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 20px;
+      }
+      .empty-title {
+        font-family: var(--font-serif);
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+      }
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 20px;
+      }
+      @media (max-width: 640px) {
+        .photo-grid {
+          grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+          gap: 10px;
+        }
+        .header {
+          padding: 0 12px;
+        }
+        .header-inner {
+          height: auto;
+          min-height: 64px;
+          gap: 10px;
+          flex-wrap: wrap;
+          padding: 10px 0;
+        }
+        .brand-name {
+          font-size: 1.05rem;
+        }
+        .photo-count {
+          order: 3;
+          width: 100%;
+          text-align: center;
+        }
+        .btn {
+          padding: 9px 14px;
+          font-size: 0.85rem;
+        }
+      }
+      .photo-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-light);
+        display: flex;
+        flex-direction: column;
+      }
+      .photo-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+      }
+      .img-container {
+        width: 100%;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        background: #f5f0e8;
+      }
+      .img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.4s;
+      }
+      .photo-card:hover .img-container img {
+        transform: scale(1.03);
+      }
+      .card-info {
+        padding: 12px 14px;
+        flex: 1;
+      }
+      .card-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .card-date {
+        font-size: 0.75rem;
+        color: var(--text-lighter);
+        margin-top: 4px;
+      }
+      .photo-card {
+        position: relative;
+      }
+
+      /* Lightbox */
+      .lightbox-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 15, 10, 0.92);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.35s;
+        backdrop-filter: blur(8px);
+      }
+      .lightbox-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .lightbox-content {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        max-width: 90vw;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        transform: scale(0.9);
+        transition: 0.35s;
+      }
+      .active .lightbox-content {
+        transform: scale(1);
+      }
+      .lightbox-img-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #1a1510;
+      }
+      .lightbox-img-wrap img {
+        max-width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+      }
+      .lightbox-info {
+        padding: 16px 20px;
+        border-top: 1px solid #eee;
+      }
+      .lightbox-close,
+      .lightbox-nav {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+        z-index: 10;
+      }
+      .lightbox-close {
+        top: 12px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+      }
+      .lightbox-nav {
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+      .lightbox-nav.prev {
+        left: 16px;
+      }
+      .lightbox-nav.next {
+        right: 16px;
+      }
+      .lightbox-close:hover,
+      .lightbox-nav:hover {
+        background: rgba(0, 0, 0, 0.8);
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(30, 20, 12, 0.7);
+        z-index: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+        backdrop-filter: blur(4px);
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 20px;
+        padding: 28px 24px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        transform: translateY(20px);
+        transition: 0.3s;
+        position: relative;
+      }
+      .modal-close {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        background: #eee;
+        color: #333;
+      }
+      .active .modal {
+        transform: translateY(0);
+      }
+      .modal-title {
+        font-family: var(--font-serif);
+        font-size: 1.3rem;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .drop-zone {
+        border: 3px dashed var(--border);
+        border-radius: 16px;
+        padding: 32px 16px;
+        text-align: center;
+        cursor: pointer;
+        background: #faf7f2;
+        margin-bottom: 16px;
+        transition: 0.2s;
+      }
+      .drop-zone:hover,
+      .drop-zone.drag-over {
+        border-color: var(--accent);
+        background: var(--accent-light);
+      }
+      .drop-icon {
+        font-size: 2.5rem;
+        display: block;
+      }
+      .drop-help {
+        font-size: 0.8rem;
+        color: var(--text-lighter);
+      }
+      .preview-thumbs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      .preview-thumbs img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 2px;
+      }
+      .form-group {
+        margin-bottom: 12px;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        background: #fefdfb;
+      }
+      .btn-full {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+      }
+      .upload-progress {
+        height: 6px;
+        background: #eee;
+        border-radius: 3px;
+        margin: 12px 0;
+        display: none;
+        overflow: hidden;
+      }
+      .upload-progress .bar {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: 0.3s;
+      }
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: #3d3226;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: 500;
+        z-index: 2000;
+        transition: 0.4s;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+      .toast.success {
+        background: #2e7d32;
+      }
+      .toast.error {
+        background: #c0392b;
+      }
+      .footer {
+        text-align: center;
+        padding: 16px;
+        color: var(--text-lighter);
+        border-top: 1px solid var(--border-light);
+        background: rgba(255, 255, 255, 0.5);
+        font-size: 0.8rem;
+      }
+      .hidden {
+        display: none;
+      }
+      .lb-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .lb-desc {
+        color: #666;
+        margin: 4px 0;
+      }
+      .lb-date {
+        color: #999;
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-inner">
+        <a href="#" class="brand"
+          ><div class="brand-icon">📷</div>
+          <span class="brand-name">记忆永存</span></a
+        >
+        <div class="photo-count">📸 <span id="countNum">0</span> 份记忆</div>
+        <button class="btn" id="btnUpload" type="button">＋ 上传照片</button>
+      </div>
+    </header>
+
+    <main class="main-container">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🖼️</div>
+        <h2 class="empty-title">还没有人分享记忆</h2>
+        <p class="empty-desc">成为第一个上传照片的人吧，你的记忆将在此永存。</p>
+        <button class="btn" id="btnUploadEmpty" type="button">
+          ＋ 添加第一份记忆
+        </button>
+      </div>
+      <div class="photo-grid hidden" id="photoGrid"></div>
+    </main>
+
+    <div class="modal-overlay" id="uploadModal">
+      <div class="modal">
+        <button
+          class="lightbox-close modal-close"
+          id="btnModalClose"
+          type="button"
+        >
+          ✕
+        </button>
+        <h3 class="modal-title">📷 分享照片</h3>
+        <div class="drop-zone" id="dropZone">
+          <span class="drop-icon">📁</span>
+          <p>点击选择照片或拖拽到此处</p>
+          <p class="drop-help">支持 JPG/PNG/WebP，单张不超过 10MB</p>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden />
+        </div>
+        <div class="preview-thumbs" id="previewThumbs"></div>
+        <div class="form-group">
+          <input type="text" id="photoTitle" placeholder="照片标题（可选）" />
+        </div>
+        <div class="form-group">
+          <textarea
+            id="photoDesc"
+            rows="2"
+            placeholder="描述这段记忆（可选）"
+          ></textarea>
+        </div>
+        <div class="upload-progress" id="uploadProgress">
+          <div class="bar" id="progressBar"></div>
+        </div>
+        <button class="btn btn-full" id="btnConfirmUpload" type="button">
+          ✅ 确认上传
+        </button>
+      </div>
+    </div>
+
+    <div class="lightbox-overlay" id="lightbox">
+      <button class="lightbox-close" id="btnLightboxClose" type="button">
+        ✕
+      </button>
+      <button class="lightbox-nav prev" id="btnPrev" type="button">◀</button>
+      <button class="lightbox-nav next" id="btnNext" type="button">▶</button>
+      <div class="lightbox-content">
+        <div class="lightbox-img-wrap">
+          <img
+            id="lightboxImg"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+            alt=""
+          />
+        </div>
+        <div class="lightbox-info">
+          <div class="lb-title" id="lbTitle"></div>
+          <div class="lb-desc" id="lbDesc"></div>
+          <div class="lb-date" id="lbDate"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <footer class="footer">🌍 记忆永存 · 每个人都能看见的共享相册</footer>
+
+    <script>
+      // ==================== 您的 Supabase 配置 (仅声明一次) ====================
+      const SUPABASE_URL = "https://trosjcbvfhnfkelflijc.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "sb_publishable_sZYKAIzDJJYQgzC2Buzhyw_art6KnAS";
+
+      // 初始化 Supabase 客户端 (唯一一次赋值)
+      const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+      );
+
+      const BUCKET_NAME = "memories";
+      const TABLE_NAME = "photos";
+
+      // ==================== 全局状态 ====================
+      let allPhotos = [];
+      let currentLightboxIndex = -1;
+      let pendingFiles = [];
+
+      // DOM 元素
+      const $photoGrid = document.getElementById("photoGrid");
+      const $emptyState = document.getElementById("emptyState");
+      const $countNum = document.getElementById("countNum");
+      const $uploadModal = document.getElementById("uploadModal");
+      const $dropZone = document.getElementById("dropZone");
+      const $fileInput = document.getElementById("fileInput");
+      const $previewThumbs = document.getElementById("previewThumbs");
+      const $photoTitle = document.getElementById("photoTitle");
+      const $photoDesc = document.getElementById("photoDesc");
+      const $uploadProgress = document.getElementById("uploadProgress");
+      const $progressBar = document.getElementById("progressBar");
+      const $btnConfirm = document.getElementById("btnConfirmUpload");
+      const $lightbox = document.getElementById("lightbox");
+      const $lightboxImg = document.getElementById("lightboxImg");
+      const $lbTitle = document.getElementById("lbTitle");
+      const $lbDesc = document.getElementById("lbDesc");
+      const $lbDate = document.getElementById("lbDate");
+      const $toast = document.getElementById("toast");
+
+      function toast(msg, type = "") {
+        $toast.textContent = msg;
+        $toast.className = "toast " + type + " show";
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => $toast.classList.remove("show"), 3000);
+      }
+
+      async function loadPhotos() {
+        const { data, error } = await supabase
+          .from(TABLE_NAME)
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) {
+          console.error("加载照片失败:", error);
+          toast("加载照片失败，请检查网络或配置", "error");
+          allPhotos = [];
+        } else {
+          allPhotos = data || [];
+        }
+        renderPhotos();
+      }
+
+      function renderPhotos() {
+        $photoGrid.innerHTML = "";
+        if (allPhotos.length === 0) {
+          $photoGrid.classList.add("hidden");
+          $emptyState.style.display = "flex";
+        } else {
+          $photoGrid.classList.remove("hidden");
+          $emptyState.style.display = "none";
+          allPhotos.forEach((photo, idx) => {
+            const card = document.createElement("div");
+            card.className = "photo-card";
+            card.style.animationDelay = `${idx * 0.03}s`;
+            card.innerHTML = `
+            <div class="img-container">
+              <img src="${escapeHTML(photo.image_url)}" alt="${escapeHTML(photo.title || "")}" loading="lazy">
+            </div>
+            <div class="card-info">
+              <div class="card-title">${escapeHTML(photo.title || "未命名记忆")}</div>
+              <div class="card-date">📅 ${formatDate(photo.created_at)}</div>
+            </div>
+          `;
+            card.addEventListener("click", (e) => {
+              openLightbox(idx);
+            });
+            $photoGrid.appendChild(card);
+          });
+        }
+        $countNum.textContent = allPhotos.length;
+      }
+
+      function escapeHTML(str) {
+        const div = document.createElement("div");
+        div.textContent = str || "";
+        return div.innerHTML;
+      }
+
+      function formatDate(isoString) {
+        if (!isoString) return "";
+        const d = new Date(isoString);
+        return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+      }
+
+      function openLightbox(index) {
+        if (index < 0 || index >= allPhotos.length) return;
+        currentLightboxIndex = index;
+        const p = allPhotos[index];
+        $lightboxImg.src = p.image_url;
+        $lbTitle.textContent = p.title || "未命名记忆";
+        $lbDesc.textContent = p.description || "";
+        $lbDate.textContent = "📅 " + formatDate(p.created_at);
+        $lightbox.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeLightbox() {
+        $lightbox.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      function navLightbox(dir) {
+        if (allPhotos.length === 0) return;
+        let idx = currentLightboxIndex + dir;
+        if (idx < 0) idx = allPhotos.length - 1;
+        if (idx >= allPhotos.length) idx = 0;
+        openLightbox(idx);
+      }
+
+      function openUploadModal() {
+        resetForm();
+        $uploadModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeUploadModal() {
+        $uploadModal.classList.remove("active");
+        document.body.style.overflow = "";
+        resetForm();
+      }
+
+      function resetForm() {
+        $fileInput.value = "";
+        $photoTitle.value = "";
+        $photoDesc.value = "";
+        $previewThumbs.innerHTML = "";
+        $uploadProgress.style.display = "none";
+        $progressBar.style.width = "0%";
+        pendingFiles = [];
+      }
+
+      function handleFiles(files) {
+        const valid = Array.from(files).filter((f) => {
+          if (!f.type.startsWith("image/")) {
+            toast(`"${f.name}" 不是图片`, "error");
+            return false;
+          }
+          if (f.size > 10 * 1024 * 1024) {
+            toast(`"${f.name}" 超过10MB`, "error");
+            return false;
+          }
+          return true;
+        });
+        if (!valid.length) return;
+        pendingFiles = [...pendingFiles, ...valid];
+        valid.forEach((f) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const thumb = document.createElement("img");
+            thumb.src = e.target.result;
+            $previewThumbs.appendChild(thumb);
+          };
+          reader.readAsDataURL(f);
+        });
+        if (pendingFiles.length && !$photoTitle.value) {
+          $photoTitle.value = pendingFiles[0].name
+            .replace(/\.[^.]+$/, "")
+            .slice(0, 40);
+        }
+      }
+
+      async function startUpload() {
+        if (!pendingFiles.length) {
+          toast("请先选择照片", "error");
+          return;
+        }
+        $btnConfirm.disabled = true;
+        $btnConfirm.textContent = "⏳ 上传中...";
+        $uploadProgress.style.display = "block";
+        $progressBar.style.width = "0%";
+        const title = $photoTitle.value.trim();
+        const desc = $photoDesc.value.trim();
+        let success = 0;
+        const total = pendingFiles.length;
+
+        for (let i = 0; i < total; i++) {
+          const file = pendingFiles[i];
+          try {
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${file.name}`;
+            const { data: uploadData, error: uploadError } =
+              await supabase.storage.from(BUCKET_NAME).upload(fileName, file, {
+                cacheControl: "3600",
+                upsert: false,
+              });
+            if (uploadError) throw uploadError;
+            const { data: publicUrlData } = supabase.storage
+              .from(BUCKET_NAME)
+              .getPublicUrl(fileName);
+            const imageUrl = publicUrlData.publicUrl;
+            const { error: insertError } = await supabase
+              .from(TABLE_NAME)
+              .insert({
+                title: title || file.name.replace(/\.[^.]+$/, ""),
+                description: desc,
+                image_url: imageUrl,
+                created_at: new Date().toISOString(),
+              });
+            if (insertError) throw insertError;
+            success++;
+          } catch (err) {
+            console.error("上传失败:", file.name, err);
+            toast(`"${file.name}" 上传失败`, "error");
+          }
+          $progressBar.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
+        }
+        await loadPhotos();
+        resetForm();
+        $uploadProgress.style.display = "none";
+        $btnConfirm.disabled = false;
+        $btnConfirm.textContent = "✅ 确认上传";
+        closeUploadModal();
+        if (success) toast(`成功上传 ${success} 张照片！`, "success");
+      }
+
+      // 事件绑定
+      document
+        .getElementById("btnUpload")
+        .addEventListener("click", openUploadModal);
+      document
+        .getElementById("btnUploadEmpty")
+        .addEventListener("click", openUploadModal);
+      document
+        .getElementById("btnModalClose")
+        .addEventListener("click", closeUploadModal);
+      $uploadModal.addEventListener("click", (e) => {
+        if (e.target === $uploadModal) closeUploadModal();
+      });
+      $btnConfirm.addEventListener("click", startUpload);
+      $dropZone.addEventListener("click", () => $fileInput.click());
+      $fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length) handleFiles(e.target.files);
+      });
+      $dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        $dropZone.classList.add("drag-over");
+      });
+      $dropZone.addEventListener("dragleave", () =>
+        $dropZone.classList.remove("drag-over"),
+      );
+      $dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        $dropZone.classList.remove("drag-over");
+        if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+      });
+      document.addEventListener("dragover", (e) => e.preventDefault());
+      document.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if ($uploadModal.classList.contains("active")) return;
+        if (
+          e.dataTransfer.files.length &&
+          Array.from(e.dataTransfer.files).some((f) =>
+            f.type.startsWith("image/"),
+          )
+        ) {
+          openUploadModal();
+          handleFiles(e.dataTransfer.files);
+        }
+      });
+      document
+        .getElementById("btnLightboxClose")
+        .addEventListener("click", closeLightbox);
+      $lightbox.addEventListener("click", (e) => {
+        if (e.target === $lightbox) closeLightbox();
+      });
+      document
+        .getElementById("btnPrev")
+        .addEventListener("click", () => navLightbox(-1));
+      document
+        .getElementById("btnNext")
+        .addEventListener("click", () => navLightbox(1));
+      document.addEventListener("keydown", (e) => {
+        if ($lightbox.classList.contains("active")) {
+          if (e.key === "Escape") closeLightbox();
+          if (e.key === "ArrowLeft") navLightbox(-1);
+          if (e.key === "ArrowRight") navLightbox(1);
+        }
+        if ($uploadModal.classList.contains("active") && e.key === "Escape")
+          closeUploadModal();
+      });
+
+      // 启动加载
+      loadPhotos();
+    </script>
+  </body>
+</html>
