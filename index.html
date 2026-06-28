@@ -249,6 +249,72 @@
         background: rgba(255, 255, 255, 0.22);
       }
 
+      .btn-outline {
+        border-color: rgba(220, 239, 235, 0.16);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--ink);
+        box-shadow: none;
+      }
+
+      .btn-outline:hover {
+        border-color: rgba(139, 228, 207, 0.34);
+        background: rgba(139, 228, 207, 0.1);
+        box-shadow: none;
+      }
+
+      .btn-outline .btn-symbol {
+        background: rgba(139, 228, 207, 0.16);
+        color: var(--accent);
+      }
+
+      .btn-small {
+        min-height: 34px;
+        padding: 0 14px;
+        font-size: 0.8rem;
+      }
+
+      .invite-banner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+        padding: 18px 20px;
+        border: 1px solid rgba(139, 228, 207, 0.22);
+        border-radius: var(--radius-lg);
+        background:
+          linear-gradient(140deg, rgba(139, 228, 207, 0.1), transparent 48%),
+          rgba(255, 255, 255, 0.04);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .invite-banner-copy {
+        min-width: 0;
+      }
+
+      .invite-banner-title {
+        font-family: var(--font-serif);
+        font-size: 1.05rem;
+        font-weight: 900;
+        line-height: 1.25;
+      }
+
+      .invite-banner-note {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.55;
+      }
+
+      .invite-banner-meta {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
       .main-container {
         width: 100%;
         max-width: 1180px;
@@ -668,6 +734,292 @@
         background: rgba(255, 255, 255, 0.2);
       }
 
+      .tool-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 950;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        opacity: 0;
+        pointer-events: none;
+        background: rgba(9, 13, 12, 0.8);
+        backdrop-filter: blur(14px);
+        transition: opacity 0.28s ease;
+      }
+
+      .tool-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .tool-panel {
+        position: relative;
+        width: min(92vw, 760px);
+        max-height: 90vh;
+        overflow: auto;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: var(--radius-lg);
+        background: rgba(13, 17, 16, 0.98);
+        box-shadow: 0 36px 90px rgba(0, 0, 0, 0.42);
+        padding: 24px;
+        transform: translateY(12px) scale(0.985);
+        transition: transform 0.28s ease;
+      }
+
+      .tool-overlay.active .tool-panel {
+        transform: none;
+      }
+
+      .tool-panel.narrow {
+        width: min(92vw, 640px);
+      }
+
+      .tool-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .tool-title {
+        font-family: var(--font-serif);
+        font-size: 1.6rem;
+        font-weight: 900;
+        line-height: 1.15;
+      }
+
+      .tool-subtitle {
+        max-width: 54ch;
+        margin-top: 8px;
+        color: var(--muted);
+        line-height: 1.65;
+        font-size: 0.92rem;
+      }
+
+      .tool-close {
+        top: 18px;
+        right: 18px;
+      }
+
+      .tool-grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field-label {
+        color: var(--quiet);
+        font-size: 0.74rem;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .field-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--ink);
+        outline: none;
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition),
+          background var(--transition);
+      }
+
+      .field-input:focus {
+        border-color: rgba(139, 228, 207, 0.58);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 4px rgba(139, 228, 207, 0.1);
+      }
+
+      .field-input::placeholder {
+        color: rgba(169, 187, 180, 0.72);
+      }
+
+      .field-input.textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+
+      .field-hint {
+        color: var(--quiet);
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+
+      .drop-zone {
+        padding: 22px 18px;
+        border: 1.5px dashed var(--line-strong);
+        border-radius: 14px;
+        background:
+          linear-gradient(135deg, rgba(139, 228, 207, 0.12), transparent 70%),
+          var(--surface-soft);
+        text-align: center;
+        cursor: pointer;
+        transition:
+          border-color var(--transition),
+          background var(--transition),
+          transform var(--transition);
+      }
+
+      .drop-zone:hover,
+      .drop-zone.dragging {
+        border-color: var(--accent);
+        background:
+          linear-gradient(135deg, rgba(139, 228, 207, 0.18), transparent 70%),
+          #162420;
+        transform: translateY(-1px);
+      }
+
+      .drop-icon {
+        width: 46px;
+        height: 46px;
+        margin: 0 auto 12px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #081210;
+        font-size: 1.35rem;
+        font-weight: 900;
+      }
+
+      .drop-title {
+        color: var(--ink);
+        font-weight: 900;
+      }
+
+      .drop-help {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+        gap: 8px;
+      }
+
+      .preview-grid img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .invite-result {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid rgba(220, 239, 235, 0.14);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .invite-result strong {
+        font-family: var(--font-serif);
+        font-size: 1rem;
+      }
+
+      .invite-link-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .invite-link-row .field-input {
+        flex: 1;
+      }
+
+      .invite-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .invite-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: start;
+        padding: 12px 14px;
+        border: 1px solid rgba(220, 239, 235, 0.12);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .invite-row h4 {
+        font-size: 0.98rem;
+        line-height: 1.35;
+      }
+
+      .invite-row p {
+        margin-top: 4px;
+        color: var(--quiet);
+        font-size: 0.78rem;
+        line-height: 1.5;
+      }
+
+      .invite-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border: 1px solid rgba(220, 239, 235, 0.12);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+
+      .upload-progress {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .upload-progress .bar {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--accent), var(--gold));
+        transition: width 0.25s ease;
+      }
+
+      .tool-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
       .toast {
         position: fixed;
         left: 50%;
@@ -700,12 +1052,20 @@
       }
 
       .footer {
-        padding: 18px;
+        padding: 16px 18px;
         border-top: 1px solid rgba(220, 239, 235, 0.12);
         background: rgba(12, 18, 17, 0.72);
         color: var(--quiet);
-        text-align: center;
         font-size: 0.82rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .footer-tool {
+        margin-left: auto;
       }
 
       .hidden {
@@ -754,6 +1114,16 @@
 
         .main-container {
           padding: 26px 14px 56px;
+        }
+
+        .invite-banner {
+          align-items: flex-start;
+          flex-direction: column;
+          padding: 16px;
+        }
+
+        .footer-tool {
+          margin-left: 0;
         }
 
         .empty-state {
@@ -858,11 +1228,33 @@
             <strong id="countNum">0</strong><span>枚记忆</span>
           </div>
           <div class="photo-count"><strong>只读</strong><span>藏馆</span></div>
+          <button
+            class="btn btn-outline btn-small hidden"
+            id="btnOpenInvitePanel"
+            type="button"
+          >
+            <span class="btn-symbol">∞</span><span>邀请管理</span>
+          </button>
         </div>
       </div>
     </header>
 
     <main class="main-container">
+      <section class="invite-banner hidden" id="inviteBanner">
+        <div class="invite-banner-copy">
+          <div class="invite-banner-title">你已获得上传权限</div>
+          <div class="invite-banner-note">
+            这是邀请制入口。只要链接还有效，你就可以把记忆上传进藏馆；普通访客仍然只能浏览。
+          </div>
+          <div class="invite-banner-meta">
+            <span class="chip" id="inviteBannerName">邀请人</span>
+            <span class="chip" id="inviteBannerExpiry">有效期</span>
+          </div>
+        </div>
+        <button class="btn btn-hero" id="btnOpenUpload" type="button">
+          <span class="btn-symbol">↑</span><span>上传记忆</span>
+        </button>
+      </section>
       <div class="empty-state" id="emptyState">
         <section class="empty-copy">
           <div class="empty-eyebrow">The Archive of Memory</div>
@@ -915,13 +1307,184 @@
     </div>
 
     <div class="toast" id="toast"></div>
-    <footer class="footer">记忆藏馆 · 《诸神愚戏》记忆之神的只读档案</footer>
+    <footer class="footer">
+      <span>记忆藏馆 · 《诸神愚戏》记忆之神的只读档案</span>
+      <button
+        class="btn btn-outline btn-small footer-tool hidden"
+        id="btnOpenInvitePanelFooter"
+        type="button"
+      >
+        <span class="btn-symbol">∞</span><span>邀请管理</span>
+      </button>
+    </footer>
+
+    <div class="tool-overlay" id="invitePanel">
+      <div class="tool-panel narrow">
+        <button
+          class="lightbox-close tool-close"
+          id="btnCloseInvitePanel"
+          type="button"
+        >
+          ✕
+        </button>
+        <div class="tool-head">
+          <div>
+            <div class="archive-kicker">Invite Control</div>
+            <div class="tool-title">邀请链接管理</div>
+            <div class="tool-subtitle">
+              生成一次性或限时邀请，发给群友后，他们就能通过链接进入上传页。未带
+              token 的访问仍然是只读。
+            </div>
+          </div>
+        </div>
+        <div class="tool-grid">
+          <div class="field">
+            <div class="field-label">馆主密钥</div>
+            <input
+              id="ownerKeyInput"
+              class="field-input"
+              type="password"
+              autocomplete="current-password"
+              placeholder="输入馆主密钥才能生成邀请"
+            />
+            <div class="field-hint">
+              这把密钥只在本地使用，建议放在浏览器记住，不要发给别人。
+            </div>
+          </div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="field-label">邀请人名称</div>
+              <input
+                id="inviteNameInput"
+                class="field-input"
+                type="text"
+                placeholder="例如：群友A"
+              />
+            </div>
+            <div class="field">
+              <div class="field-label">有效时长（小时）</div>
+              <input
+                id="inviteHoursInput"
+                class="field-input"
+                type="number"
+                min="1"
+                max="720"
+                value="72"
+              />
+            </div>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-hero" id="btnCreateInvite" type="button">
+              <span class="btn-symbol">+</span><span>生成邀请</span>
+            </button>
+            <button
+              class="btn btn-outline"
+              id="btnRefreshInvites"
+              type="button"
+            >
+              <span class="btn-symbol">↻</span><span>刷新列表</span>
+            </button>
+          </div>
+          <div class="invite-result hidden" id="inviteResult">
+            <strong>新的邀请链接</strong>
+            <div class="invite-link-row">
+              <input
+                class="field-input"
+                id="inviteResultUrl"
+                type="text"
+                readonly
+              />
+              <button
+                class="btn btn-outline btn-small"
+                id="btnCopyInvite"
+                type="button"
+              >
+                复制
+              </button>
+            </div>
+          </div>
+          <div class="invite-list" id="inviteList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-overlay" id="uploadModal">
+      <div class="tool-panel">
+        <button
+          class="lightbox-close tool-close"
+          id="btnCloseUploadPanel"
+          type="button"
+        >
+          ✕
+        </button>
+        <div class="tool-head">
+          <div>
+            <div class="archive-kicker">Upload Memory</div>
+            <div class="tool-title">上传一枚记忆</div>
+            <div class="tool-subtitle">
+              只有通过邀请链接进入的人才能看到这里。上传完成后，记忆会出现在藏馆里。
+            </div>
+          </div>
+        </div>
+        <div class="tool-grid">
+          <button class="drop-zone" id="dropZone" type="button">
+            <span class="drop-icon">+</span>
+            <span class="drop-title">选择照片，或将记忆切片拖拽至此</span>
+            <span class="drop-help"
+              >支持 JPG / PNG / WebP，单枚不超过 10MB</span
+            >
+          </button>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden />
+          <div class="preview-grid" id="previewThumbs"></div>
+          <div class="field-grid">
+            <div class="field">
+              <div class="field-label">记忆名称</div>
+              <input
+                class="field-input"
+                id="photoTitle"
+                type="text"
+                placeholder="可留空，系统会自动命名"
+              />
+            </div>
+            <div class="field">
+              <div class="field-label">来源说明</div>
+              <input
+                class="field-input"
+                id="photoSource"
+                type="text"
+                placeholder="例如：某次群聊、某场活动"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">补充说明</div>
+            <textarea
+              class="field-input textarea"
+              id="photoDesc"
+              rows="3"
+              placeholder="写下这枚记忆的来处（可选）"
+            ></textarea>
+          </div>
+          <div class="upload-progress hidden" id="uploadProgress">
+            <div class="bar" id="progressBar"></div>
+          </div>
+          <div class="tool-actions">
+            <button class="btn btn-hero" id="btnConfirmUpload" type="button">
+              <span class="btn-symbol">↑</span><span>存入藏馆</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script>
       // ==================== 您的 Supabase 配置 (仅声明一次) ====================
       const SUPABASE_URL = "https://trosjcbvfhnfkelflijc.supabase.co";
       const SUPABASE_ANON_KEY =
         "sb_publishable_sZYKAIzDJJYQgzC2Buzhyw_art6KnAS";
+      const FUNCTION_BASE_URL = `${SUPABASE_URL}/functions/v1`;
+      const OWNER_MODE_KEY = "memory_vault_owner_mode";
+      const OWNER_SECRET_KEY = "memory_vault_owner_secret";
 
       // 初始化 Supabase 客户端。即使初始化失败，也让页面交互先可用。
       let supabaseClient = null;
@@ -942,8 +1505,13 @@
       // ==================== 全局状态 ====================
       let allPhotos = [];
       let currentLightboxIndex = -1;
+      let pendingFiles = [];
+      let activeInvite = null;
 
       // DOM 元素
+      const $inviteBanner = document.getElementById("inviteBanner");
+      const $inviteBannerName = document.getElementById("inviteBannerName");
+      const $inviteBannerExpiry = document.getElementById("inviteBannerExpiry");
       const $photoGrid = document.getElementById("photoGrid");
       const $emptyState = document.getElementById("emptyState");
       const $archiveHead = document.getElementById("archiveHead");
@@ -954,12 +1522,110 @@
       const $lbDesc = document.getElementById("lbDesc");
       const $lbDate = document.getElementById("lbDate");
       const $toast = document.getElementById("toast");
+      const $invitePanel = document.getElementById("invitePanel");
+      const $uploadModal = document.getElementById("uploadModal");
+      const $ownerKeyInput = document.getElementById("ownerKeyInput");
+      const $inviteNameInput = document.getElementById("inviteNameInput");
+      const $inviteHoursInput = document.getElementById("inviteHoursInput");
+      const $inviteResult = document.getElementById("inviteResult");
+      const $inviteResultUrl = document.getElementById("inviteResultUrl");
+      const $inviteList = document.getElementById("inviteList");
+      const $fileInput = document.getElementById("fileInput");
+      const $dropZone = document.getElementById("dropZone");
+      const $previewThumbs = document.getElementById("previewThumbs");
+      const $photoTitle = document.getElementById("photoTitle");
+      const $photoSource = document.getElementById("photoSource");
+      const $photoDesc = document.getElementById("photoDesc");
+      const $uploadProgress = document.getElementById("uploadProgress");
+      const $progressBar = document.getElementById("progressBar");
+      const $btnConfirmUpload = document.getElementById("btnConfirmUpload");
+      const $ownerButtons = [
+        document.getElementById("btnOpenInvitePanel"),
+        document.getElementById("btnOpenInvitePanelFooter"),
+      ];
 
       function toast(msg, type = "") {
         $toast.textContent = msg;
         $toast.className = "toast " + type + " show";
         clearTimeout(toast._timer);
         toast._timer = setTimeout(() => $toast.classList.remove("show"), 3000);
+      }
+
+      function getInviteToken() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("invite") || "";
+      }
+
+      function isOwnerMode() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("owner") === "1") {
+          localStorage.setItem(OWNER_MODE_KEY, "1");
+          return true;
+        }
+        return localStorage.getItem(OWNER_MODE_KEY) === "1";
+      }
+
+      function ownerSecret() {
+        return $ownerKeyInput.value.trim();
+      }
+
+      function saveOwnerSecret() {
+        if (ownerSecret()) {
+          localStorage.setItem(OWNER_SECRET_KEY, ownerSecret());
+        }
+      }
+
+      async function callVaultFunction(action, payload = {}, options = {}) {
+        const response = await fetch(
+          `${FUNCTION_BASE_URL}/memory-vault-invite`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ action, ...payload }),
+          },
+        );
+        let data = {};
+        try {
+          data = await response.json();
+        } catch (error) {
+          data = {};
+        }
+        if (!response.ok && !options.allowError) {
+          throw new Error(data.error || "请求失败");
+        }
+        return { ok: response.ok, data };
+      }
+
+      async function checkInvite() {
+        const token = getInviteToken();
+        if (!token) return;
+        try {
+          const { data } = await callVaultFunction("checkInvite", { token });
+          activeInvite = data.invite;
+          renderInviteBanner();
+        } catch (error) {
+          console.warn("邀请验证失败:", error);
+          toast("邀请链接无效或已过期", "error");
+        }
+      }
+
+      function renderInviteBanner() {
+        if (!activeInvite) return;
+        $inviteBanner.classList.remove("hidden");
+        $inviteBannerName.textContent = activeInvite.name || "受邀上传";
+        const expires = activeInvite.expires_at
+          ? formatDate(activeInvite.expires_at)
+          : "长期有效";
+        $inviteBannerExpiry.textContent = `有效至 ${expires}`;
+      }
+
+      function setupOwnerMode() {
+        if (!isOwnerMode()) return;
+        $ownerButtons.forEach((button) => button?.classList.remove("hidden"));
+        $ownerKeyInput.value = localStorage.getItem(OWNER_SECRET_KEY) || "";
       }
 
       async function loadPhotos() {
@@ -1071,7 +1737,296 @@
         openLightbox(idx);
       }
 
+      function openPanel(panel) {
+        panel.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closePanel(panel) {
+        panel.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      function openInvitePanel() {
+        openPanel($invitePanel);
+        if (ownerSecret()) refreshInvites();
+      }
+
+      function closeInvitePanel() {
+        closePanel($invitePanel);
+      }
+
+      function openUploadPanel() {
+        if (!activeInvite) {
+          toast("需要有效邀请链接才能上传", "error");
+          return;
+        }
+        resetUploadForm();
+        openPanel($uploadModal);
+      }
+
+      function closeUploadPanel() {
+        closePanel($uploadModal);
+        resetUploadForm();
+      }
+
+      function buildInviteUrl(token) {
+        const url = new URL(window.location.href);
+        url.search = "";
+        url.hash = "";
+        url.searchParams.set("invite", token);
+        return url.toString();
+      }
+
+      async function createInvite() {
+        const name = $inviteNameInput.value.trim() || "受邀上传";
+        const hours = Math.max(
+          1,
+          Math.min(720, Number($inviteHoursInput.value) || 72),
+        );
+        if (!ownerSecret()) {
+          toast("请先输入馆主密钥", "error");
+          return;
+        }
+        try {
+          saveOwnerSecret();
+          const { data } = await callVaultFunction("createInvite", {
+            ownerSecret: ownerSecret(),
+            name,
+            expiresInHours: hours,
+          });
+          const inviteUrl = buildInviteUrl(data.token);
+          $inviteResultUrl.value = inviteUrl;
+          $inviteResult.classList.remove("hidden");
+          $inviteNameInput.value = "";
+          await refreshInvites();
+          toast("邀请链接已生成", "success");
+        } catch (error) {
+          toast(error.message || "生成邀请失败", "error");
+        }
+      }
+
+      async function refreshInvites() {
+        if (!ownerSecret()) return;
+        try {
+          saveOwnerSecret();
+          const { data } = await callVaultFunction("listInvites", {
+            ownerSecret: ownerSecret(),
+          });
+          renderInvites(data.invites || []);
+        } catch (error) {
+          toast(error.message || "读取邀请失败", "error");
+        }
+      }
+
+      function renderInvites(invites) {
+        $inviteList.innerHTML = "";
+        if (!invites.length) {
+          $inviteList.innerHTML =
+            '<div class="field-hint">还没有邀请链接。</div>';
+          return;
+        }
+        invites.forEach((invite) => {
+          const row = document.createElement("div");
+          row.className = "invite-row";
+          const status = invite.revoked_at
+            ? "已撤销"
+            : invite.expires_at && new Date(invite.expires_at) < new Date()
+              ? "已过期"
+              : "可使用";
+          row.innerHTML = `
+            <div>
+              <h4>${escapeHTML(invite.name || "受邀上传")}</h4>
+              <p>${escapeHTML(buildInviteUrl(invite.token))}</p>
+              <div class="invite-meta">
+                <span class="chip">${escapeHTML(status)}</span>
+                <span class="chip">已用 ${Number(invite.used_count || 0)} 次</span>
+                <span class="chip">有效至 ${escapeHTML(invite.expires_at ? formatDate(invite.expires_at) : "长期有效")}</span>
+              </div>
+            </div>
+            <div class="tool-actions">
+              <button class="btn btn-outline btn-small" type="button" data-copy="${escapeHTML(invite.token)}">复制</button>
+              <button class="btn btn-outline btn-small" type="button" data-revoke="${escapeHTML(invite.id)}">撤销</button>
+            </div>
+          `;
+          $inviteList.appendChild(row);
+        });
+      }
+
+      async function revokeInvite(id) {
+        if (!id || !ownerSecret()) return;
+        try {
+          await callVaultFunction("revokeInvite", {
+            ownerSecret: ownerSecret(),
+            id,
+          });
+          await refreshInvites();
+          toast("邀请已撤销", "success");
+        } catch (error) {
+          toast(error.message || "撤销失败", "error");
+        }
+      }
+
+      function resetUploadForm() {
+        pendingFiles = [];
+        $fileInput.value = "";
+        $previewThumbs.innerHTML = "";
+        $photoTitle.value = "";
+        $photoSource.value = "";
+        $photoDesc.value = "";
+        $uploadProgress.classList.add("hidden");
+        $progressBar.style.width = "0%";
+        $btnConfirmUpload.disabled = false;
+        $btnConfirmUpload.innerHTML =
+          '<span class="btn-symbol">↑</span><span>存入藏馆</span>';
+      }
+
+      function handleFiles(files) {
+        const valid = Array.from(files).filter((file) => {
+          if (!file.type.startsWith("image/")) {
+            toast(`"${file.name}" 不是图片`, "error");
+            return false;
+          }
+          if (file.size > 10 * 1024 * 1024) {
+            toast(`"${file.name}" 超过 10MB`, "error");
+            return false;
+          }
+          return true;
+        });
+        if (!valid.length) return;
+        pendingFiles = [...pendingFiles, ...valid];
+        valid.forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const thumb = document.createElement("img");
+            thumb.src = event.target.result;
+            thumb.alt = file.name;
+            $previewThumbs.appendChild(thumb);
+          };
+          reader.readAsDataURL(file);
+        });
+        if (!$photoTitle.value && pendingFiles[0]) {
+          $photoTitle.value = pendingFiles[0].name
+            .replace(/\.[^.]+$/, "")
+            .slice(0, 40);
+        }
+      }
+
+      async function uploadInvitedFiles() {
+        const token = getInviteToken();
+        if (!activeInvite || !token) {
+          toast("邀请链接无效，无法上传", "error");
+          return;
+        }
+        if (!pendingFiles.length) {
+          toast("请先选择照片", "error");
+          return;
+        }
+        $btnConfirmUpload.disabled = true;
+        $btnConfirmUpload.textContent = "封存中...";
+        $uploadProgress.classList.remove("hidden");
+        let success = 0;
+        for (let i = 0; i < pendingFiles.length; i++) {
+          const file = pendingFiles[i];
+          try {
+            const formData = new FormData();
+            formData.append("action", "uploadMemory");
+            formData.append("token", token);
+            formData.append("file", file);
+            formData.append("title", $photoTitle.value.trim());
+            formData.append("source", $photoSource.value.trim());
+            formData.append("description", $photoDesc.value.trim());
+            const response = await fetch(
+              `${FUNCTION_BASE_URL}/memory-vault-invite`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                },
+                body: formData,
+              },
+            );
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(data.error || "上传失败");
+            }
+            success++;
+          } catch (error) {
+            console.error("上传失败:", error);
+            toast(`"${file.name}" 上传失败`, "error");
+          }
+          $progressBar.style.width = `${Math.round(((i + 1) / pendingFiles.length) * 100)}%`;
+        }
+        if (success) {
+          toast(`已封存 ${success} 枚记忆`, "success");
+          closeUploadPanel();
+          await loadPhotos();
+          await checkInvite();
+        } else {
+          $btnConfirmUpload.disabled = false;
+          $btnConfirmUpload.innerHTML =
+            '<span class="btn-symbol">↑</span><span>存入藏馆</span>';
+        }
+      }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          toast("已复制", "success");
+        } catch (error) {
+          toast("复制失败，请手动复制", "error");
+        }
+      }
+
       // 事件绑定
+      document
+        .getElementById("btnOpenUpload")
+        .addEventListener("click", openUploadPanel);
+      $ownerButtons.forEach((button) =>
+        button?.addEventListener("click", openInvitePanel),
+      );
+      document
+        .getElementById("btnCloseInvitePanel")
+        .addEventListener("click", closeInvitePanel);
+      document
+        .getElementById("btnCloseUploadPanel")
+        .addEventListener("click", closeUploadPanel);
+      $invitePanel.addEventListener("click", (e) => {
+        if (e.target === $invitePanel) closeInvitePanel();
+      });
+      $uploadModal.addEventListener("click", (e) => {
+        if (e.target === $uploadModal) closeUploadPanel();
+      });
+      document
+        .getElementById("btnCreateInvite")
+        .addEventListener("click", createInvite);
+      document
+        .getElementById("btnRefreshInvites")
+        .addEventListener("click", refreshInvites);
+      document
+        .getElementById("btnCopyInvite")
+        .addEventListener("click", () => copyText($inviteResultUrl.value));
+      $inviteList.addEventListener("click", (e) => {
+        const copyToken = e.target.dataset.copy;
+        const revokeId = e.target.dataset.revoke;
+        if (copyToken) copyText(buildInviteUrl(copyToken));
+        if (revokeId) revokeInvite(revokeId);
+      });
+      $dropZone.addEventListener("click", () => $fileInput.click());
+      $fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
+      $dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        $dropZone.classList.add("dragging");
+      });
+      $dropZone.addEventListener("dragleave", () =>
+        $dropZone.classList.remove("dragging"),
+      );
+      $dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        $dropZone.classList.remove("dragging");
+        handleFiles(e.dataTransfer.files);
+      });
+      $btnConfirmUpload.addEventListener("click", uploadInvitedFiles);
       document
         .getElementById("btnLightboxClose")
         .addEventListener("click", closeLightbox);
@@ -1090,9 +2045,15 @@
           if (e.key === "ArrowLeft") navLightbox(-1);
           if (e.key === "ArrowRight") navLightbox(1);
         }
+        if (e.key === "Escape") {
+          if ($invitePanel.classList.contains("active")) closeInvitePanel();
+          if ($uploadModal.classList.contains("active")) closeUploadPanel();
+        }
       });
 
       // 启动加载
+      setupOwnerMode();
+      checkInvite();
       loadPhotos();
     </script>
   </body>

@@ -1,0 +1,2 @@
+[functions.memory-vault-invite]
+verify_jwt = false
