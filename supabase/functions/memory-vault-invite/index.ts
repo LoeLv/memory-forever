@@ -1,4 +1,5 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { withSupabase } from "jsr:@supabase/server@^1";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -9,14 +10,8 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const ownerSecret = Deno.env.get("MEMORY_VAULT_OWNER_SECRET") ?? "";
 const bucketName = Deno.env.get("MEMORY_VAULT_BUCKET") ?? "memories";
-
-const admin = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { persistSession: false },
-});
 
 class InviteError extends Error {
   status: number;
@@ -27,43 +22,52 @@ class InviteError extends Error {
   }
 }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return json({ ok: true });
-  }
-  if (req.method !== "POST") {
-    return json({ error: "Method not allowed" }, 405);
-  }
+console.info("memory-vault-invite started");
 
-  try {
-    const contentType = req.headers.get("content-type") || "";
-    if (contentType.includes("multipart/form-data")) {
-      const form = await req.formData();
-      const action = String(form.get("action") || "");
-      if (action === "uploadMemory") return uploadMemoryForm(form);
-      return json(
-        { error: "Multipart requests only support uploadMemory" },
-        400,
-      );
-    }
+export default {
+  fetch: withSupabase(
+    { auth: ["publishable", "secret"] },
+    async (req, ctx) => {
+      if (req.method === "OPTIONS") {
+        return json({ ok: true });
+      }
+      if (req.method !== "POST") {
+        return json({ error: "Method not allowed" }, 405);
+      }
 
-    const body = (await req.json()) as JsonRecord;
-    const action = String(body.action || "");
+      const admin = ctx.supabaseAdmin;
 
-    if (action === "checkInvite") return checkInvite(body);
-    if (action === "createInvite") return createInvite(body);
-    if (action === "listInvites") return listInvites(body);
-    if (action === "revokeInvite") return revokeInvite(body);
+      try {
+        const contentType = req.headers.get("content-type") || "";
+        if (contentType.includes("multipart/form-data")) {
+          const form = await req.formData();
+          const action = String(form.get("action") || "");
+          if (action === "uploadMemory") return uploadMemoryForm(admin, form);
+          return json(
+            { error: "Multipart requests only support uploadMemory" },
+            400,
+          );
+        }
 
-    return json({ error: "Unknown action" }, 400);
-  } catch (error) {
-    if (error instanceof InviteError) {
-      return json({ error: error.message }, error.status);
-    }
-    console.error(error);
-    return json({ error: "Server error" }, 500);
-  }
-});
+        const body = (await req.json()) as JsonRecord;
+        const action = String(body.action || "");
+
+        if (action === "checkInvite") return checkInvite(admin, body);
+        if (action === "createInvite") return createInvite(admin, body);
+        if (action === "listInvites") return listInvites(admin, body);
+        if (action === "revokeInvite") return revokeInvite(admin, body);
+
+        return json({ error: "Unknown action" }, 400);
+      } catch (error) {
+        if (error instanceof InviteError) {
+          return json({ error: error.message }, error.status);
+        }
+        console.error(error);
+        return json({ error: "Server error" }, 500);
+      }
+    },
+  ),
+};
 
 function json(payload: JsonRecord, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -84,13 +88,13 @@ function requireOwner(body: JsonRecord) {
   }
 }
 
-async function checkInvite(body: JsonRecord) {
+async function checkInvite(admin: any, body: JsonRecord) {
   const token = String(body.token || "");
-  const invite = await findInvite(token);
+  const invite = await findInvite(admin, token);
   return json({ invite: publicInvite(invite) });
 }
 
-async function createInvite(body: JsonRecord) {
+async function createInvite(admin: any, body: JsonRecord) {
   try {
     requireOwner(body);
   } catch (error) {
@@ -120,7 +124,7 @@ async function createInvite(body: JsonRecord) {
   return json({ token, invite: data });
 }
 
-async function listInvites(body: JsonRecord) {
+async function listInvites(admin: any, body: JsonRecord) {
   try {
     requireOwner(body);
   } catch (error) {
@@ -141,7 +145,7 @@ async function listInvites(body: JsonRecord) {
   return json({ invites: data || [] });
 }
 
-async function revokeInvite(body: JsonRecord) {
+async function revokeInvite(admin: any, body: JsonRecord) {
   try {
     requireOwner(body);
   } catch (error) {
@@ -164,9 +168,9 @@ async function revokeInvite(body: JsonRecord) {
   return json({ ok: true });
 }
 
-async function uploadMemoryForm(form: FormData) {
+async function uploadMemoryForm(admin: any, form: FormData) {
   const token = String(form.get("token") || "");
-  const invite = await findInvite(token);
+  const invite = await findInvite(admin, token);
   const file = form.get("file");
 
   if (!(file instanceof File)) {
@@ -238,7 +242,7 @@ async function uploadMemoryForm(form: FormData) {
   return json({ photo });
 }
 
-async function findInvite(token: string) {
+async function findInvite(admin: any, token: string) {
   if (!token) throw new InviteError("Missing invite token", 400);
   const { data, error } = await admin
     .from("upload_invites")
