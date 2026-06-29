@@ -170,7 +170,19 @@ async function revokeInvite(admin: any, body: JsonRecord) {
 
 async function uploadMemoryForm(admin: any, form: FormData) {
   const token = String(form.get("token") || "");
-  const invite = await findInvite(admin, token);
+  const ownerUpload = !token && String(form.get("ownerSecret") || "");
+  let invite: JsonRecord | null = null;
+  if (token) {
+    invite = await findInvite(admin, token);
+  } else if (ownerUpload) {
+    try {
+      requireOwner({ ownerSecret: ownerUpload });
+    } catch (error) {
+      return json({ error: errorMessage(error) }, 401);
+    }
+  } else {
+    return json({ error: "Missing upload permission" }, 400);
+  }
   const file = form.get("file");
 
   if (!(file instanceof File)) {
@@ -188,7 +200,8 @@ async function uploadMemoryForm(admin: any, form: FormData) {
     return json({ error: "File is larger than 10MB" }, 400);
   }
 
-  const path = `invited/${invite.id}/${Date.now()}-${crypto.randomUUID()}-${fileName}`;
+  const uploadRoot = invite ? `invited/${invite.id}` : "owner";
+  const path = `${uploadRoot}/${Date.now()}-${crypto.randomUUID()}-${fileName}`;
   const { error: uploadError } = await admin.storage
     .from(bucketName)
     .upload(path, bytes, {
@@ -208,7 +221,7 @@ async function uploadMemoryForm(admin: any, form: FormData) {
   const description = buildDescription(
     String(form.get("description") || ""),
     String(form.get("source") || ""),
-    invite.name || "",
+    invite ? String(invite.name || "") : "馆主",
   );
   const title =
     String(form.get("title") || "")
@@ -231,13 +244,15 @@ async function uploadMemoryForm(admin: any, form: FormData) {
     return json({ error: "Failed to save memory" }, 500);
   }
 
-  await admin
-    .from("upload_invites")
-    .update({
-      used_count: Number(invite.used_count || 0) + 1,
-      last_used_at: new Date().toISOString(),
-    })
-    .eq("id", invite.id);
+  if (invite) {
+    await admin
+      .from("upload_invites")
+      .update({
+        used_count: Number(invite.used_count || 0) + 1,
+        last_used_at: new Date().toISOString(),
+      })
+      .eq("id", invite.id);
+  }
 
   return json({ photo });
 }

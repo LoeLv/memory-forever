@@ -1272,6 +1272,13 @@
           >
             <span class="btn-symbol">∞</span><span>邀请管理</span>
           </button>
+          <button
+            class="btn btn-outline btn-small hidden"
+            id="btnOpenOwnerUpload"
+            type="button"
+          >
+            <span class="btn-symbol">↑</span><span>上传记忆</span>
+          </button>
         </div>
       </div>
     </header>
@@ -1459,7 +1466,7 @@
             <div class="archive-kicker">Upload Memory</div>
             <div class="tool-title">上传一枚记忆</div>
             <div class="tool-subtitle">
-              只有通过邀请链接进入的人才能看到这里。上传完成后，记忆会出现在藏馆里。
+              通过邀请链接进入的人，或输入过馆主密钥的馆主，可以把记忆上传进藏馆。
             </div>
           </div>
         </div>
@@ -1576,10 +1583,12 @@
       const $uploadProgress = document.getElementById("uploadProgress");
       const $progressBar = document.getElementById("progressBar");
       const $btnConfirmUpload = document.getElementById("btnConfirmUpload");
-      const $ownerButtons = [
+      const $ownerUploadButton = document.getElementById("btnOpenOwnerUpload");
+      const $ownerInviteButtons = [
         document.getElementById("btnOpenInvitePanel"),
         document.getElementById("btnOpenInvitePanelFooter"),
       ];
+      const $ownerModeButtons = [$ownerUploadButton, ...$ownerInviteButtons];
 
       function toast(msg, type = "") {
         $toast.textContent = msg;
@@ -1662,7 +1671,9 @@
 
       function setupOwnerMode() {
         if (!isOwnerMode()) return;
-        $ownerButtons.forEach((button) => button?.classList.remove("hidden"));
+        $ownerModeButtons.forEach((button) =>
+          button?.classList.remove("hidden"),
+        );
         $ownerKeyInput.value = localStorage.getItem(OWNER_SECRET_KEY) || "";
       }
 
@@ -1795,8 +1806,14 @@
       }
 
       function openUploadPanel() {
-        if (!activeInvite) {
-          toast("需要有效邀请链接才能上传", "error");
+        const canUploadAsOwner = isOwnerMode() && ownerSecret();
+        if (!activeInvite && !canUploadAsOwner) {
+          if (isOwnerMode()) {
+            toast("请先在邀请管理里输入馆主密钥", "error");
+            openInvitePanel();
+          } else {
+            toast("需要有效邀请链接才能上传", "error");
+          }
           return;
         }
         resetUploadForm();
@@ -1952,8 +1969,15 @@
 
       async function uploadInvitedFiles() {
         const token = getInviteToken();
-        if (!activeInvite || !token) {
-          toast("邀请链接无效，无法上传", "error");
+        const canUploadWithInvite = Boolean(activeInvite && token);
+        const canUploadAsOwner = isOwnerMode() && ownerSecret();
+        if (!canUploadWithInvite && !canUploadAsOwner) {
+          if (isOwnerMode()) {
+            toast("请先在邀请管理里输入馆主密钥", "error");
+            openInvitePanel();
+          } else {
+            toast("邀请链接无效，无法上传", "error");
+          }
           return;
         }
         if (!pendingFiles.length) {
@@ -1969,7 +1993,12 @@
           try {
             const formData = new FormData();
             formData.append("action", "uploadMemory");
-            formData.append("token", token);
+            if (canUploadWithInvite) {
+              formData.append("token", token);
+            } else {
+              saveOwnerSecret();
+              formData.append("ownerSecret", ownerSecret());
+            }
             formData.append("file", file);
             formData.append("title", $photoTitle.value.trim());
             formData.append("source", $photoSource.value.trim());
@@ -1992,7 +2021,7 @@
             success++;
           } catch (error) {
             console.error("上传失败:", error);
-            toast(`"${file.name}" 上传失败`, "error");
+            toast(`"${file.name}" ${error.message || "上传失败"}`, "error");
           }
           $progressBar.style.width = `${Math.round(((i + 1) / pendingFiles.length) * 100)}%`;
         }
@@ -2000,7 +2029,7 @@
           toast(`已封存 ${success} 枚记忆`, "success");
           closeUploadPanel();
           await loadPhotos();
-          await checkInvite();
+          if (canUploadWithInvite) await checkInvite();
         } else {
           $btnConfirmUpload.disabled = false;
           $btnConfirmUpload.innerHTML =
@@ -2021,7 +2050,8 @@
       document
         .getElementById("btnOpenUpload")
         .addEventListener("click", openUploadPanel);
-      $ownerButtons.forEach((button) =>
+      $ownerUploadButton?.addEventListener("click", openUploadPanel);
+      $ownerInviteButtons.forEach((button) =>
         button?.addEventListener("click", openInvitePanel),
       );
       document
