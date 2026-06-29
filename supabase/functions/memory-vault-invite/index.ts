@@ -56,6 +56,7 @@ export default {
         if (action === "createInvite") return createInvite(admin, body);
         if (action === "listInvites") return listInvites(admin, body);
         if (action === "revokeInvite") return revokeInvite(admin, body);
+        if (action === "deleteMemory") return deleteMemory(admin, body);
 
         return json({ error: "Unknown action" }, 400);
       } catch (error) {
@@ -163,6 +164,48 @@ async function revokeInvite(admin: any, body: JsonRecord) {
   if (error) {
     console.error(error);
     return json({ error: "Failed to revoke invite" }, 500);
+  }
+
+  return json({ ok: true });
+}
+
+async function deleteMemory(admin: any, body: JsonRecord) {
+  try {
+    requireOwner(body);
+  } catch (error) {
+    return json({ error: errorMessage(error) }, 401);
+  }
+
+  const id = String(body.id || "");
+  if (!id) return json({ error: "Missing memory id" }, 400);
+
+  const { data: photo, error: readError } = await admin
+    .from("photos")
+    .select("id, image_url")
+    .eq("id", id)
+    .single();
+
+  if (readError || !photo) {
+    console.error(readError);
+    return json({ error: "Memory not found" }, 404);
+  }
+
+  const storagePath = storagePathFromPublicUrl(String(photo.image_url || ""));
+  if (storagePath) {
+    const { error: removeError } = await admin.storage
+      .from(bucketName)
+      .remove([storagePath]);
+    if (removeError) console.error(removeError);
+  }
+
+  const { error: deleteError } = await admin
+    .from("photos")
+    .delete()
+    .eq("id", id);
+
+  if (deleteError) {
+    console.error(deleteError);
+    return json({ error: "Failed to delete memory" }, 500);
   }
 
   return json({ ok: true });
@@ -311,4 +354,17 @@ function buildDescription(
     inviteName.trim() ? `上传者：${inviteName.trim()}` : "",
   ].filter(Boolean);
   return parts.join("\n");
+}
+
+function storagePathFromPublicUrl(publicUrl: string) {
+  if (!publicUrl) return "";
+  try {
+    const url = new URL(publicUrl);
+    const marker = `/storage/v1/object/public/${bucketName}/`;
+    const index = url.pathname.indexOf(marker);
+    if (index === -1) return "";
+    return decodeURIComponent(url.pathname.slice(index + marker.length));
+  } catch (_error) {
+    return "";
+  }
 }

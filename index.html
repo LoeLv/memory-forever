@@ -292,6 +292,17 @@
         color: var(--accent);
       }
 
+      .btn-danger {
+        border-color: rgba(223, 92, 72, 0.45);
+        background: rgba(223, 92, 72, 0.12);
+        color: #ffd8d2;
+      }
+
+      .btn-danger:hover {
+        border-color: rgba(223, 92, 72, 0.76);
+        background: rgba(223, 92, 72, 0.2);
+      }
+
       .btn-small {
         min-height: 34px;
         padding: 0 14px;
@@ -709,6 +720,13 @@
         padding: 18px 22px;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
         background: rgba(13, 17, 16, 0.96);
+      }
+
+      .lightbox-actions {
+        margin-top: 14px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
       }
 
       .lightbox-close,
@@ -1346,6 +1364,15 @@
           <div class="lb-title" id="lbTitle"></div>
           <div class="lb-desc" id="lbDesc"></div>
           <div class="lb-date" id="lbDate"></div>
+          <div class="lightbox-actions">
+            <button
+              class="btn btn-outline btn-small btn-danger hidden"
+              id="btnDeleteMemory"
+              type="button"
+            >
+              删除记忆
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1565,6 +1592,7 @@
       const $lbTitle = document.getElementById("lbTitle");
       const $lbDesc = document.getElementById("lbDesc");
       const $lbDate = document.getElementById("lbDate");
+      const $btnDeleteMemory = document.getElementById("btnDeleteMemory");
       const $toast = document.getElementById("toast");
       const $invitePanel = document.getElementById("invitePanel");
       const $uploadModal = document.getElementById("uploadModal");
@@ -1769,6 +1797,7 @@
         $lbTitle.textContent = displayTitle(p);
         $lbDesc.textContent = p.description || "";
         $lbDate.textContent = "封存于 " + formatDate(p.created_at);
+        $btnDeleteMemory.classList.toggle("hidden", !isOwnerMode());
         $lightbox.classList.add("active");
         document.body.style.overflow = "hidden";
       }
@@ -1919,6 +1948,30 @@
           toast("邀请已撤销", "success");
         } catch (error) {
           toast(error.message || "撤销失败", "error");
+        }
+      }
+
+      async function deleteCurrentMemory() {
+        const photo = allPhotos[currentLightboxIndex];
+        if (!photo?.id) return;
+        if (!ownerSecret()) {
+          toast("请先在邀请管理里输入馆主密钥", "error");
+          openInvitePanel();
+          return;
+        }
+        const title = displayTitle(photo);
+        if (!confirm(`确定删除「${title}」吗？删除后不能恢复。`)) return;
+        try {
+          saveOwnerSecret();
+          await callVaultFunction("deleteMemory", {
+            ownerSecret: ownerSecret(),
+            id: photo.id,
+          });
+          toast("记忆已删除", "success");
+          closeLightbox();
+          await loadPhotos();
+        } catch (error) {
+          toast(error.message || "删除失败", "error");
         }
       }
 
@@ -2075,6 +2128,7 @@
       document
         .getElementById("btnCopyInvite")
         .addEventListener("click", () => copyText($inviteResultUrl.value));
+      $btnDeleteMemory.addEventListener("click", deleteCurrentMemory);
       $inviteList.addEventListener("click", (e) => {
         const copyToken = e.target.dataset.copy;
         const revokeId = e.target.dataset.revoke;
